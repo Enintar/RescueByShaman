@@ -1,0 +1,10 @@
+name: Rescue
+version: '${project.version}'
+main: shaman.rescue.Rescue
+authors: [ Shaman ]
+description: Plugin for spawn teleport by suite
+website: letnicraft.ru
+commands:
+  rescue:
+    description: Command for spawn teleport by suite
+    permission: admin.rescue
