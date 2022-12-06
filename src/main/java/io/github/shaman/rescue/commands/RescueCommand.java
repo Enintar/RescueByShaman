@@ -1,67 +1,49 @@
 package io.github.shaman.rescue.commands;
 
+import io.github.shaman.rescue.Rescue;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import io.github.shaman.rescue.Rescue;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class RescueCommand implements org.bukkit.command.CommandExecutor {
+public class RescueCommand implements CommandExecutor {
+    public static final String COMMAND_CONSOLE = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fДанную команду можно выполнять только с &cконсоли&f!");
+    public static final String COMMAND_USAGE = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fИспользуйте: &c/rescue [ник]");
+    public static final String COMMAND_SUCCESS_ONLINE = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fВы успешно телепортировали &c%s &fна спавн!");
+    public static final String COMMAND_NO_PLAYER = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fИгрок с ником &c%s &fне существует!");
+    public static final String COMMAND_ALREADY = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fИгрок с ником &c%s &fуже есть в очереди!");
+    public static final String COMMAND_SUCCESS_OFFLINE = ChatColor.translateAlternateColorCodes('&', "&cRescue &7| &fВы успешно добавили &c%s &fв очередь!");
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (JavaPlugin.getPlugin(Rescue.class).getConfig().getBoolean("CommandOnlyC")) {
-            if ((sender instanceof Player)) {
-                sender.sendMessage("&cRescue &7| &fДанную команду можно выполнять только с &cконсоли".replace("&", "§"));
-            } else {
-                if (args.length == 0) {
-                    sender.sendMessage("&cRescue &7| &fИспользуйте: &c/rescue [ник]".replace("&", "§"));
-                } else {
-                    OfflinePlayer a = getServer().getOfflinePlayer(args[0]);
-                    if (a.isOnline()) {
-                        a.getPlayer().teleport(JavaPlugin.getPlugin(Rescue.class).s);
-                        a.getPlayer().sendTitle("Вы были телепортированы на спавн!".replace("&", "§"), "&cУдачной игры!".replace("&", "§"));
-                        sender.sendMessage("&cRescue &7| &fВы успешно телепортировали &c".replace("&", "§") + a.getPlayer().getDisplayName() + "&f на спавн!".replace("&", "§"));
-                    } else {
-                        if (JavaPlugin.getPlugin(Rescue.class).flourmastercaban.contains(a.getName())) {
-                            sender.sendMessage("&cRescue &7| &fИгрок с ником&c ".replace("&", "§") + a.getName() + " &fуже есть в очереди!".replace("&", "§"));
-                        } else {
-                            if (a.hasPlayedBefore()) {
-                                JavaPlugin.getPlugin(Rescue.class).flourmastercaban.add(a.getName());
-                                sender.sendMessage("&cRescue &7| &fВы успешно добавили &c".replace("&", "§") + a.getName() + "&f в очередь!".replace("&", "§"));
-                            } else {
-                                sender.sendMessage("&cRescue &7| &fИгрок с ником&c ".replace("&", "§") + args[0] + " &fне существует!".replace("&", "§"));
-                            }
-                        }
-                    }
-                }
-            }
+        Rescue rescue = Rescue.getInstance();
+        if (sender instanceof Player && rescue.isConsoleOnly()) {
+            sender.sendMessage(COMMAND_CONSOLE);
+            return true;
         }
-        if (!JavaPlugin.getPlugin(Rescue.class).getConfig().getBoolean("CommandOnlyC")) {
-            if (args.length == 0) {
-                sender.sendMessage("&cRescue &7| &fИспользуйте: &c/rescue [ник]".replace("&", "§"));
-            } else {
-                OfflinePlayer a = getServer().getOfflinePlayer(args[0]);
-                if (a.isOnline()) {
-                    a.getPlayer().teleport(JavaPlugin.getPlugin(Rescue.class).s);
-                    a.getPlayer().sendTitle("Вы были телепортированы на спавн!".replace("&", "§"), "&cУдачной игры!".replace("&", "§"));
-                    sender.sendMessage("&cRescue &7| &fВы успешно телепортировали &c".replace("&", "§") + a.getPlayer().getDisplayName() + "&f на спавн!".replace("&", "§"));
-                } else {
-                    if (JavaPlugin.getPlugin(Rescue.class).flourmastercaban.contains(a.getName())) {
-                        sender.sendMessage("&cRescue &7| &fИгрок с ником&c ".replace("&", "§") + a.getName() + " &fуже есть в очереди!".replace("&", "§"));
-                    } else {
-                        if (a.hasPlayedBefore()) {
-                            JavaPlugin.getPlugin(Rescue.class).flourmastercaban.add(a.getName());
-                            sender.sendMessage("&cRescue &7| &fВы успешно добавили &c".replace("&", "§") + a.getName() + "&f в очередь!".replace("&", "§"));
-                        } else {
-                            sender.sendMessage("&cRescue &7| &fИгрок с ником&c ".replace("&", "§") + args[0] + " &fне существует!".replace("&", "§"));
-                        }
-                    }
-                }
-            }
+        if (args.length == 0) {
+            sender.sendMessage(COMMAND_USAGE);
+            return true;
         }
-        return false;
+        OfflinePlayer a = getServer().getOfflinePlayer(args[0]);
+        if (a.isOnline()) {
+            rescue.spawnTeleport(a.getPlayer());
+            sender.sendMessage(String.format(COMMAND_SUCCESS_ONLINE, a.getName()));
+            return true;
+        }
+        if (!a.hasPlayedBefore()) {
+            sender.sendMessage(String.format(COMMAND_NO_PLAYER, args[0]));
+            return true;
+        }
+        if (rescue.getTeleportNames().add(a.getName())) {
+            sender.sendMessage(String.format(COMMAND_SUCCESS_OFFLINE, a.getName()));
+        } else {
+            sender.sendMessage(String.format(COMMAND_ALREADY, a.getName()));
+        }
+        return true;
     }
 }

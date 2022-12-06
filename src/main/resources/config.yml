@@ -1,7 +1,7 @@
-CommandOnlyC: false
-CommandX: 0.5
-CommandY: 60
-CommandZ: 0.5
-CommandYAW: 0
-CommandPITCH: 0
-CommandWorldName: "world"
+consoleOnly: false
+spawnWorld: world
+spawnX: 0.5
+spawnY: 60
+spawnZ: 0.5
+spawnYaw: 0
+spawnPitch: 0

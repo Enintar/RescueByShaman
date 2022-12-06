@@ -1,52 +1,70 @@
 package io.github.shaman.rescue;
 
 import io.github.shaman.rescue.commands.RescueCommand;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public final class Rescue extends JavaPlugin implements Listener {
-    FileConfiguration config = this.getConfig();
-    public Location s;
-    public HashSet<String> flourmastercaban = new HashSet<String>();
+    // Constants
+    public static final String TELEPORT_TITLE = ChatColor.translateAlternateColorCodes('&', "&fВы были телепортированы на спавн!");
+    public static final String TELEPORT_SUBTITLE = ChatColor.translateAlternateColorCodes('&', "&cУдачной игры!");
+
+    // Plugin variables (Runtime variables)
+    private static Rescue instance;
+    private final Set<String> teleportNames = new HashSet<>();
+
+    // Config variables
+    private boolean consoleOnly;
+    private Location spawnLocation;
 
     @Override
     public void onEnable() {
-        this.getCommand("rescue").setExecutor(new RescueCommand());
-        PluginManager plugin = getServer().getPluginManager();
-        plugin.registerEvents(this,this);
-        config.addDefault("CommandOnlyC", false);
-        config.addDefault("CommandX", 0.5);
-        config.addDefault("CommandY", 0.5);
-        config.addDefault("CommandZ", 0.5);
-        config.addDefault("CommandYAW", 0);
-        config.addDefault("CommandPITCH", 0);
-        config.addDefault("CommandWorldName", "world");
-        s = new Location(getServer().getWorld(config.getString("CommandWorldName")), config.getInt("CommandX"),config.getInt("CommandY"),config.getInt("CommandZ"),config.getInt("CommandYAW"),config.getInt("CommandPITCH"));
-        this.saveDefaultConfig();
+        instance = this;
 
+        getCommand("rescue").setExecutor(new RescueCommand());
+        getServer().getPluginManager().registerEvents(this, this);
+
+        Configuration config = getConfig();
+        saveDefaultConfig();
+        consoleOnly = getConfig().getBoolean("consoleOnly", false);
+        spawnLocation = new Location(getServer().getWorld(config.getString("spawnWorld", "world")),
+                config.getDouble("spawnX", 0D), config.getDouble("spawnY", 0D),
+                config.getDouble("spawnZ", 0D), (float) config.getDouble("spawnYaw", 0D),
+                (float) config.getDouble("spawnPitch", 0D));
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        if(flourmastercaban.contains(e.getPlayer().getName())) {
-            flourmastercaban.remove(e.getPlayer().getName());
-            Player p = e.getPlayer();
-            p.teleport(s);
-            p.setLastDamage(0);
-            p.sendTitle("Вы были телепортированы на спавн!".replace("&", "§"),"&cУдачной игры!".replace("&", "§"));
+        Player p = e.getPlayer();
+        if (teleportNames.remove(p.getName())) {
+            spawnTeleport(p);
         }
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+    public void spawnTeleport(Player player) {
+        player.teleport(spawnLocation);
+        player.setLastDamage(0);
+        player.sendTitle(TELEPORT_TITLE, TELEPORT_SUBTITLE, 20, 50, 20);
+    }
+
+    public static Rescue getInstance() {
+        return instance;
+    }
+
+    public Set<String> getTeleportNames() {
+        return teleportNames;
+    }
+
+    public boolean isConsoleOnly() {
+        return consoleOnly;
     }
 }

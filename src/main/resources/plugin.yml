@@ -1,10 +1,11 @@
 name: Rescue
-version: '${project.version}'
+version: '1.0'
 main: io.github.shaman.rescue.Rescue
-authors: [ Shaman ]
-description: Plugin for spawn teleport by suite
-website: letnicraft.ru
+author: Shaman
+description: Plugin for spawn teleport via site
+website: 'https://letnicraft.ru'
 commands:
   rescue:
-    description: Command for spawn teleport by suite
-    permission: admin.rescue
+    usage: /<command> <игрок>
+    description: Command for spawn teleport via site
+    permission: rescue.usage
