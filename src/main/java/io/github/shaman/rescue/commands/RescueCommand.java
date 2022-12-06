@@ -1,4 +1,4 @@
-package io.github.shaman.rescue.RescueCommand;
+package io.github.shaman.rescue.commands;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -9,7 +9,7 @@ import io.github.shaman.rescue.Rescue;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class CommandEx implements org.bukkit.command.CommandExecutor {
+public class RescueCommand implements org.bukkit.command.CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (JavaPlugin.getPlugin(Rescue.class).getConfig().getBoolean("CommandOnlyC")) {

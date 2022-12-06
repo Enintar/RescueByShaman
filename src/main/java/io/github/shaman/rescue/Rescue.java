@@ -1,6 +1,6 @@
 package io.github.shaman.rescue;
 
-import io.github.shaman.rescue.RescueCommand.CommandEx;
+import io.github.shaman.rescue.commands.RescueCommand;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ public final class Rescue extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        this.getCommand("rescue").setExecutor(new CommandEx());
+        this.getCommand("rescue").setExecutor(new RescueCommand());
         PluginManager plugin = getServer().getPluginManager();
         plugin.registerEvents(this,this);
         config.addDefault("CommandOnlyC", false);
