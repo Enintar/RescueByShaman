@@ -1,11 +1,11 @@
-package shaman.rescue.RescueCommand;
+package io.github.shaman.rescue.RescueCommand;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import shaman.rescue.Rescue;
+import io.github.shaman.rescue.Rescue;
 
 import static org.bukkit.Bukkit.getServer;
 

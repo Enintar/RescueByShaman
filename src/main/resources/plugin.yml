@@ -1,6 +1,6 @@
 name: Rescue
 version: '${project.version}'
-main: shaman.rescue.Rescue
+main: io.github.shaman.rescue.Rescue
 authors: [ Shaman ]
 description: Plugin for spawn teleport by suite
 website: letnicraft.ru
