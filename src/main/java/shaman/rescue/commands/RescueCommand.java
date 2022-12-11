@@ -29,6 +29,7 @@ public class RescueCommand implements org.bukkit.command.CommandExecutor {
         }
         OfflinePlayer a = getServer().getOfflinePlayer(args[0]);
         if (a.isOnline()) {
+            a.getPlayer().setFallDistance(0);
             rescue.spawnTeleport(a.getPlayer());
             sender.sendMessage(String.format(COMMAND_SUCCESS_ONLINE, a.getName()));
             return true;

@@ -43,18 +43,19 @@ public final class Rescue extends JavaPlugin implements Listener {
                 (float) config.getDouble("spawnPitch", 0D));
 
     }
-
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (teleportNames.remove(p.getName())) {
-            spawnTeleport(p);
+        if (!teleportNames.contains(p.getName())) {
+            return;
         }
+        p.setFallDistance(0);
+        spawnTeleport(p);
+        teleportNames.remove(p.getName());
     }
 
     public void spawnTeleport(Player player) {
         player.teleport(spawnLocation);
-        player.setLastDamage(0);
         player.sendTitle(TELEPORT_TITLE, TELEPORT_SUBTITLE, 20, 50, 20);
     }
 
